@@ -12,7 +12,7 @@ find_package(CUDA REQUIRED)
 find_package(TensorRT REQUIRED)
 find_package(OpenCV REQUIRED)
 
-add_executable(stereolabs src/main.cpp src/TrtEngine.cc src/Yolov10.cpp)
+add_executable(stereolabs src/main.cpp src/TrtEngine.cc src/Yolov10.cpp src/Yolov8.cpp)
 
-target_link_libraries(stereolabs PUBLIC ${CUDA_LIBRARIES} ${TensorRT_LIBRARIES} ${OpenCV_LIBS})# /home/gabriels/dev/libs/TensorRT-10.3.0.26/targets/x86_64-linux-gnu/lib/libnvonnxparser.so)
+target_link_libraries(stereolabs PUBLIC ${CUDA_LIBRARIES} ${TensorRT_LIBRARIES} ${OpenCV_LIBS})
 target_include_directories(stereolabs PUBLIC include ${CUDA_INCLUDE_DIRS} ${TensorRT_INCLUDE_DIRS} ${${OpenCV_INCLUDE_DIRS}})
