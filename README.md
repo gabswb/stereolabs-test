@@ -75,4 +75,5 @@ The following table summarize some benchmarks I've made on my machine (Tesla T4)
 
 The model had also no problem to run on a video :
 
+![Alt Text](.assets/output_video.gif)
 
