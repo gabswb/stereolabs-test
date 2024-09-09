@@ -32,6 +32,8 @@ Options:
 Example:
   ./stereolabs --build fp16 --video ../samples/video.mp4 --timing
 ```
+### Results Visualization
+Since I was developping on a cloud server, I wasn't able to show in a window the visualization of the outputs. However, for video and image inference, the output is saved in the working directory.
 
 ### Model
 I chose to work on objects detection because this is a crucial task in most of perception tasks.
