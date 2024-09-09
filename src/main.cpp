@@ -35,8 +35,9 @@ bool parse_arguments(int argc, char* argv[], Options &opts) {
         else if (arg == "--build") {
             if (i + 1 < argc) {
                 opts.precision = argv[++i];
+                opts.build = true;
             } else {
-                std::cerr << "Error: --image requires a path\n";
+                std::cerr << "Error: --build requires precision\n";
                 return false;
             }
         }
