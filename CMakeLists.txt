@@ -12,7 +12,7 @@ find_package(CUDA REQUIRED)
 find_package(TensorRT REQUIRED)
 find_package(OpenCV REQUIRED)
 
-add_executable(stereolabs src/main.cpp src/TrtEngine.cc src/Yolov10.cpp src/Yolov8.cpp)
+add_executable(stereolabs src/main.cpp src/TrtEngine.cc src/Yolov10.cpp src/Yolov8.cpp src/Int8Calibrator.cpp)
 
 target_link_libraries(stereolabs PUBLIC ${CUDA_LIBRARIES} ${TensorRT_LIBRARIES} ${OpenCV_LIBS})
 target_include_directories(stereolabs PUBLIC include ${CUDA_INCLUDE_DIRS} ${TensorRT_INCLUDE_DIRS} ${${OpenCV_INCLUDE_DIRS}})

@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "TrtEngine.h"
-#include "Yolov10.hpp"
 #include "Yolov8.h"
 
 struct Options {
