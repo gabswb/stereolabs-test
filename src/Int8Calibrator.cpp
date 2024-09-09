@@ -12,6 +12,7 @@ Int8EntropyCalibrator2::Int8EntropyCalibrator2(int batchsize, int input_w, int i
     input_count_ = 3 * input_w * input_h * batchsize;
     cudaMalloc(&device_input_, input_count_ * sizeof(float));
     
+    // kinda ugly hardcoding 
     img_files_ = { 
         "image1.jpg",
         "image2.jpg",
@@ -21,18 +22,15 @@ Int8EntropyCalibrator2::Int8EntropyCalibrator2(int batchsize, int input_w, int i
     };
 }
 
-Int8EntropyCalibrator2::~Int8EntropyCalibrator2()
-{
+Int8EntropyCalibrator2::~Int8EntropyCalibrator2() {
     cudaFree(device_input_);
 }
 
-int Int8EntropyCalibrator2::getBatchSize() const noexcept
-{
+int Int8EntropyCalibrator2::getBatchSize() const noexcept {
     return batch_size_;
 }
 
-bool Int8EntropyCalibrator2::getBatch(void* bindings[], const char* names[], int nbBindings) noexcept
-{
+bool Int8EntropyCalibrator2::getBatch(void* bindings[], const char* names[], int nbBindings) noexcept {
     if (img_idx_ + batch_size_ > (int)img_files_.size()) {
         return false;
     }
@@ -41,7 +39,7 @@ bool Int8EntropyCalibrator2::getBatch(void* bindings[], const char* names[], int
     for (int i = img_idx_; i < img_idx_ + batch_size_; ++i) {
         cv::Mat img = cv::imread(img_dir_ + img_files_[i]);
         if (img.empty()){
-            std::cerr << "Image cannot open!" << std::endl;
+            std::cerr << "Cannot open Image!" << std::endl;
             return false;
         }
 
@@ -61,7 +59,7 @@ bool Int8EntropyCalibrator2::getBatch(void* bindings[], const char* names[], int
 
 const void* Int8EntropyCalibrator2::readCalibrationCache(size_t& length) noexcept
 {
-    std::cout << "reading calib cache: " << calib_table_name_ << std::endl;
+    std::cout << "Reading calibration cache: " << calib_table_name_ << std::endl;
     calib_cache_.clear();
     std::ifstream input(calib_table_name_, std::ios::binary);
     input >> std::noskipws;
@@ -75,7 +73,7 @@ const void* Int8EntropyCalibrator2::readCalibrationCache(size_t& length) noexcep
 
 void Int8EntropyCalibrator2::writeCalibrationCache(const void* cache, size_t length) noexcept
 {
-    std::cout << "writing calib cache: " << calib_table_name_ << " size: " << length << std::endl;
+    std::cout << "Writing calibration cache: " << calib_table_name_ << " size: " << length << std::endl;
     std::ofstream output(calib_table_name_, std::ios::binary);
     output.write(reinterpret_cast<const char*>(cache), length);
 }

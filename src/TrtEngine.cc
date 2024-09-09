@@ -14,6 +14,7 @@ void TrtEngine::BuildEngine(const std::string& onnx_filepath, const std::string&
     auto parser = std::unique_ptr<nvonnxparser::IParser>(nvonnxparser::createParser(*network, logger_));
     if(!parser) throw std::runtime_error("Error during parser instantiation");
 
+    // parse onnx file and save it into network
     auto parsed = parser->parseFromFile(onnx_filepath.c_str(), 2);
     if(!parsed) {
         for (size_t i=0; i < parser->getNbErrors(); ++i) {
@@ -45,7 +46,7 @@ void TrtEngine::BuildEngine(const std::string& onnx_filepath, const std::string&
     }
 
 
-
+    // serialize network
     auto plan = std::unique_ptr<nvinfer1::IHostMemory>(builder->buildSerializedNetwork(*network, *config));
     if(!plan) throw std::runtime_error("Error during plan instantiation");
 

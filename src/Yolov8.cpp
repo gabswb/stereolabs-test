@@ -33,18 +33,19 @@ cv::Mat YOLOv8::PreprocessImage(const cv::Mat& original_img) {
 }
 
 
-void YOLOv8::DrawBBoxes(const cv::Mat& image, std::vector<cv::Rect> bboxes, std::vector<int> class_ids, std::vector<float> confidences) {
+void YOLOv8::DrawBBoxes(const cv::Mat& image, std::vector<cv::Rect> boxes, std::vector<int> class_ids, std::vector<float> confidences) {
 
-    assert(bboxes.size() == class_ids.size());
-    assert(bboxes.size() == confidences.size());
+    // bboxes, class_ids and confidences need to be the same size
+    assert(boxes.size() == class_ids.size());
+    assert(boxes.size() == confidences.size());
 
-    for(size_t i=0; i < bboxes.size(); ++i) {
+    for(size_t i=0; i < boxes.size(); ++i) {
         std::stringstream stream;
         stream << std::fixed << std::setprecision(2) << confidences[i];
         std::string conf_str = stream.str();
         
-        cv::rectangle(image, bboxes[i], kClassColors[class_ids[i]], 3);
-        cv::putText(image, kClassNames[class_ids[i]] + " " + conf_str, cv::Point(bboxes[i].x, bboxes[i].y-10),
+        cv::rectangle(image, boxes[i], kClassColors[class_ids[i]], 3);
+        cv::putText(image, kClassNames[class_ids[i]] + " " + conf_str, cv::Point(boxes[i].x, boxes[i].y-10),
             cv::FONT_HERSHEY_SIMPLEX, 0.9, cv::Scalar(255, 255, 255), 2);
     }
 }
@@ -80,8 +81,11 @@ cv::Mat YOLOv8::PostprocessImage(cv::Mat& output, const cv::Mat& original_img, c
     double max_score;
 
     for (size_t i=0; i<output.rows; ++i) {
+
         float *row_ptr = output.ptr<float>(i);
         cv::Mat row_scores(1, kClassNames.size(), CV_32F, row_ptr+4);
+        
+        // compute argmax which is class_id
         cv::minMaxLoc(row_scores, 0, &max_score, 0, &class_id);
 
         if(max_score < score_treshold_) continue;
@@ -103,6 +107,7 @@ cv::Mat YOLOv8::PostprocessImage(cv::Mat& output, const cv::Mat& original_img, c
     std::vector<int> filtered_class_ids;
     std::vector<float> filtered_scores;
 
+    // Filter out boxes from NMS
     for(size_t i=0; i<nms_result.size(); ++i) {
         int idx = nms_result[i];        
         filtered_boxes.push_back(boxes[idx]);
@@ -134,7 +139,7 @@ cv::Mat YOLOv8::Detect(cv::Mat& input_img) {
 
     trt_engine_->Inference(input_tensor, output_tensor);
 
-    cv::Mat host_ouput_tensor{cv::Size{8400, 84}, CV_32F};
+    cv::Mat host_ouput_tensor{cv::Size{static_cast<int>(num_anchors_), static_cast<int>(bbox_pred_dim_)}, CV_32F};
     CUDA_CHECK(cudaMemcpy(host_ouput_tensor.ptr<float>(0), output_tensor, sizeof(float) * bbox_pred_dim_ * num_anchors_, cudaMemcpyDeviceToHost));
 
     // transpose to optimize caching when iterate over rows

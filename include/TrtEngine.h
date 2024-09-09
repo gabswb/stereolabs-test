@@ -16,6 +16,9 @@ enum class TrtPrecision {
     kINT8
 };
 
+
+// Encapsulate most of TensorRT usage
+// TrtEngine can build and run any model from onnx file
 class TrtEngine {
 
 public:
@@ -25,7 +28,11 @@ public:
     void LoadEngine(const std::string& engine_filepath);
     void Inference(void *input_tensor, void *output_tensor);
     void AsyncInference(cudaStream_t stream, void *input_tensor, void *output_tensor);
+
+    // Need to call `LoadEngine` before, otherwise return 0
     std::vector<size_t> GetInputDim();
+    
+    // Need to call `LoadEngine` before, otherwise return 0
     std::vector<size_t> GetOutputDim();
 
 private:

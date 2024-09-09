@@ -65,12 +65,16 @@ int main(int argc, char* argv[]) {
     auto trt_engine = std::make_unique<TrtEngine>(logger);
     
     if(opts.build) {
+
         if(opts.precision == "fp32") {
             trt_engine->BuildEngine("../models/yolov8n.onnx", "../models/yolov8n.engine", TrtPrecision::kFP32);
+
         } else if (opts.precision == "fp16"){
             trt_engine->BuildEngine("../models/yolov8n.onnx", "../models/yolov8n.engine", TrtPrecision::kFP16);
+
         } else if (opts.precision == "int8") {
             trt_engine->BuildEngine("../models/yolov8n.onnx", "../models/yolov8n.engine", TrtPrecision::kINT8);
+
         } else {
             std::cerr << "Precision not supported, only fp32, fp18 and int8 are supported" << std::endl;
         }
@@ -78,6 +82,8 @@ int main(int argc, char* argv[]) {
 
 
     if(!opts.image_path.empty()) {
+
+        // load tensorrt engine previously built
         trt_engine->LoadEngine("../models/yolov8n.engine");
         YOLOv8 yolo{std::move(trt_engine)};
 
@@ -96,7 +102,7 @@ int main(int argc, char* argv[]) {
 
     else if(!opts.video_path.empty()){
 
-        trt_engine->LoadEngine("../models/yolov8nfp16.engine");
+        trt_engine->LoadEngine("../models/yolov8n.engine");
         YOLOv8 yolo{std::move(trt_engine)};
 
         cv::VideoCapture cap(opts.video_path);

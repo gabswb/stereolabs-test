@@ -4,6 +4,8 @@
 #include "NvInfer.h"
 #include "utils.hpp"
 
+// Calibrator class for performing calibration during int8 quantization of a neural network
+//
 class Int8EntropyCalibrator2 : public nvinfer1::IInt8EntropyCalibrator2
 {
 public:
@@ -22,9 +24,9 @@ private:
     int input_h_;
     int img_idx_;
 
-    std::string img_dir_;
-    std::vector<std::string> img_files_;
-    size_t input_count_;
+    std::string img_dir_; // calibration data dir
+    std::vector<std::string> img_files_; // calibration images
+    size_t input_count_; 
     std::string calib_table_name_;
     const char* input_blob_name_;
     bool read_cache_;
