@@ -8,13 +8,20 @@
 #include <cuda_runtime.h>
 
 #include "utils.hpp"
+#include "Int8Calibrator.h"
+
+enum class TrtPrecision {
+    kFP32,
+    kFP16,
+    kINT8
+};
 
 class TrtEngine {
 
 public:
-    TrtEngine();
     TrtEngine(Logger logger);
-    void BuildEngine(const std::string& onnx_filepath, const std::string& engine_filepath);
+
+    void BuildEngine(const std::string& onnx_filepath, const std::string& engine_filepath, TrtPrecision precision);
     void LoadEngine(const std::string& engine_filepath);
     void Inference(void *input_tensor, void *output_tensor);
     void AsyncInference(cudaStream_t stream, void *input_tensor, void *output_tensor);
@@ -31,5 +38,5 @@ private:
     std::unique_ptr<nvinfer1::ICudaEngine> engine_;
     std::unique_ptr<nvinfer1::IExecutionContext> context_;
 
-
+    std::unique_ptr<Int8EntropyCalibrator2> calibrator_;
 };

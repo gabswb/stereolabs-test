@@ -119,6 +119,9 @@ cv::Mat YOLOv10::Detect(cv::Mat& input_img) {
 
     cv::Mat postprocessed_image = PostprocessImage(host_ouput_tensor, input_img, original_size);
 
+    CUDA_CHECK(cudaFree(input_tensor));
+    CUDA_CHECK(cudaFree(output_tensor));
+
     return postprocessed_image;
 }
 

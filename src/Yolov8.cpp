@@ -120,6 +120,7 @@ cv::Mat YOLOv8::PostprocessImage(cv::Mat& output, const cv::Mat& original_img, c
 cv::Mat YOLOv8::Detect(cv::Mat& input_img) {
 
     cv::Size original_size = input_img.size();
+
     cv::Mat preprocessed_img = PreprocessImage(input_img);
 
     float *input_tensor, *output_tensor;
@@ -133,10 +134,12 @@ cv::Mat YOLOv8::Detect(cv::Mat& input_img) {
     cv::Mat host_ouput_tensor{cv::Size{8400, 84}, CV_32F};
     CUDA_CHECK(cudaMemcpy(host_ouput_tensor.ptr<float>(0), output_tensor, sizeof(float) * bbox_pred_dim_ * num_anchors_, cudaMemcpyDeviceToHost));
 
-    cv::Mat host_ouput_tensor_transposed;
-    cv::transpose(host_ouput_tensor, host_ouput_tensor_transposed);
+    host_ouput_tensor = host_ouput_tensor.t();
 
-    cv::Mat postprocessed_image = PostprocessImage(host_ouput_tensor_transposed, input_img, original_size);
+    cv::Mat postprocessed_image = PostprocessImage(host_ouput_tensor, input_img, original_size);
+
+    CUDA_CHECK(cudaFree(input_tensor));
+    CUDA_CHECK(cudaFree(output_tensor));
 
     return postprocessed_image;
 }

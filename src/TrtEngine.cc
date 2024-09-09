@@ -1,10 +1,9 @@
 #include "TrtEngine.h"
 
-TrtEngine::TrtEngine() : logger_{} {}
-
 TrtEngine::TrtEngine(Logger logger) : logger_{logger} {}
 
-void TrtEngine::BuildEngine(const std::string& onnx_filepath, const std::string& engine_filepath) {
+
+void TrtEngine::BuildEngine(const std::string& onnx_filepath, const std::string& engine_filepath, TrtPrecision precision) {
 
     auto builder = std::unique_ptr<nvinfer1::IBuilder>(nvinfer1::createInferBuilder(logger_));
     if(!builder) throw std::runtime_error("Error during builder instantiation");
@@ -23,10 +22,29 @@ void TrtEngine::BuildEngine(const std::string& onnx_filepath, const std::string&
         throw std::runtime_error("onnx file not parsed");
     }
 
+
     auto config = std::unique_ptr<nvinfer1::IBuilderConfig>(builder->createBuilderConfig());
     if(!config) throw std::runtime_error("Error during config instantiation");
 
-    // config->setFlag(nvinfer1::BuilderFlag::kFP16); TODO
+    if(precision == TrtPrecision::kFP16) {
+        if(builder->platformHasFastFp16()) {
+            config->setFlag(nvinfer1::BuilderFlag::kFP16); 
+        } else {
+            std::cerr << "fp16 quantization not supported by device \n";
+        }
+    }
+
+    if(precision == TrtPrecision::kINT8) {
+        if(builder->platformHasFastInt8()) {
+            config->setFlag((nvinfer1::BuilderFlag::kINT8));
+            calibrator_ = std::make_unique<Int8EntropyCalibrator2>(1, 640, 640, "../images/", "calib_table", "input_image");
+            config->setInt8Calibrator(calibrator_.get());
+        } else {
+            std::cerr << "int8 quantization not supported by device \n";
+        }
+    }
+
+
 
     auto plan = std::unique_ptr<nvinfer1::IHostMemory>(builder->buildSerializedNetwork(*network, *config));
     if(!plan) throw std::runtime_error("Error during plan instantiation");
@@ -64,6 +82,8 @@ void TrtEngine::LoadEngine(const std::string& engine_filepath) {
     output_tensor_name_ = engine_->getIOTensorName(1);
 }
 
+
+
 void TrtEngine::AsyncInference(cudaStream_t stream, void *input_tensor, void *output_tensor) {
     context_->setInputTensorAddress(input_tensor_name_.c_str(), input_tensor);
     context_->setOutputTensorAddress(output_tensor_name_.c_str(), output_tensor);
@@ -75,6 +95,8 @@ void TrtEngine::AsyncInference(cudaStream_t stream, void *input_tensor, void *ou
 
     context_->enqueueV3(stream);
 }
+
+
 
 void TrtEngine::Inference(void *input_tensor, void *output_tensor) {
     void* bindings[] = { input_tensor, output_tensor };
