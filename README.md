@@ -50,4 +50,29 @@ The last dimension is the number of anchors, which are all the detected object a
 
 The following image illustrates the input and output :
 
+![image](.assets/yolov8_input.png)
+![image](.assets/yolov8_output.png) 
+
 ### Results
+I took advantage of the TensorRT library and used reduced precision (`fp32`, `fp16` and `int8`) inference to reduced inference time.
+fp16 was actually almost 66% times faster on my machine (Tesla T4) while mainting good results. The int8 inference was even faster.
+However, the results were totally wrong. This is probably due to the fact that int8 quantization requires calibration, but I only had 5 images at my disposal and limited computing resources.
+
+The following table summarize some benchmarks I've made on my machine (Tesla T4) with warmups etc :
+
+| fp32 | fp16 | int8 |
+| :--- | :--: | ----:|
+| 18ms | 12ms | 10ms |
+
+`fp32` results :
+![image](.assets/image1_fp32.jpg)
+
+`fp18` results :
+![image](.assets/image1_fp16.jpg)
+
+`int8` results :
+![image](.assets/image1_int8.jpg)
+
+The model had also no problem to run on a video :
+
+
