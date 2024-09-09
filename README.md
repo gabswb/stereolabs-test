@@ -42,10 +42,10 @@ I chose to use the smallest one (YOLOv8n).
 
 #### Input/Output Format
 The model takes an input tensor of dimension `[batch_size, 3, 640, 640]`. Where batch size is usefull when processing multiple images at the time,
-3 is the channels number and 640x640 is the image dimension. The images have to be in RGB too. It is therefore necessary to preprocess the image before
+3 is the channels number and 640x640 is the image dimension. The images have to be in RGB as well. It is therefore necessary to preprocess the image before
 feeding it into the network.
 
-The model output a tensor of dimension `[batch_size, 84, 8400]`. Where 84 is `[x1,y1,x2,y2 + 80 classes scores]`, `(x1,y1)` top left corner and `(x2,y2)` bottom right corner of the bouding box. There is 80 possible classes so 80 probabilites which sums to 1.
+The model output a tensor of dimension `[batch_size, 84, 8400]`. Where 84 is `[x1,y1,x2,y2 + 80 classes scores]`, `(x1,y1)` top left corner and `(x2,y2)` bottom right corner of the bouding box. There is 80 possible classes so 80 probabilites which sums up to 1.
 The last dimension is the number of anchors, which are all the detected object at different scales. Therefore, we need to postprocess the ouput to reduce the number of detected objects, especially by performing Non Max Suppression (NMS) to get rid of overlapping bounding boxes.
 
 The following image illustrates the input and output :
@@ -56,7 +56,7 @@ The following image illustrates the input and output :
 ### Results
 I took advantage of the TensorRT library and used reduced precision (`fp32`, `fp16` and `int8`) inference to reduced inference time.
 fp16 was actually almost 66% times faster on my machine (Tesla T4) while mainting good results. The int8 inference was even faster.
-However, the results were totally wrong. This is probably due to the fact that int8 quantization requires calibration, but I only had 5 images at my disposal and limited computing resources.
+However, the results were totally wrong for this precision. This is probably due to the fact that int8 quantization requires calibration, but I only had 5 images at my disposal and limited computing resources.
 
 The following table summarize some benchmarks I've made on my machine (Tesla T4) with warmups etc :
 
@@ -67,8 +67,8 @@ The following table summarize some benchmarks I've made on my machine (Tesla T4)
 `fp32` results :
 ![image](.assets/image1_fp32.jpg)
 
-`fp18` results :
-![image](.assets/image1_fp16.jpg)
+`fp16` results :
+![image](.assets/images1_fp16.jpg)
 
 `int8` results :
 ![image](.assets/image1_int8.jpg)
