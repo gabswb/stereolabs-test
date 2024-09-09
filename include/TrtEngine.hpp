@@ -8,7 +8,7 @@
 #include <cuda_runtime.h>
 
 #include "utils.hpp"
-#include "Int8Calibrator.h"
+#include "Int8Calibrator.hpp"
 
 enum class TrtPrecision {
     kFP32,

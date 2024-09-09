@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "TrtEngine.h"
-#include "Yolov8.h"
+#include "TrtEngine.hpp"
+#include "Yolov8.hpp"
 
 struct Options {
     bool build = false;

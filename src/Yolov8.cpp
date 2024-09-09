@@ -1,4 +1,4 @@
-#include "Yolov8.h"
+#include "Yolov8.hpp"
 
 YOLOv8::YOLOv8(std::unique_ptr<TrtEngine> trt_engine) : score_treshold_{0.2}, nms_treshold_{0.5}, trt_engine_{std::move(trt_engine)} {
     std::vector<size_t> input_dim = trt_engine_->GetInputDim();
