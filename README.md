@@ -11,7 +11,7 @@ Here is my submission for the technical test.
 
 ```bash
 docker build -t stereolabs . # might takes a long time bc of the opencv build (~1h on my modest machine)
-docker run --gpus all -it --name stereolabs -v /local/folder:/workspace/stereolabs stereolabs
+docker run --gpus all -it --name stereolabs -v $(pwd):/workspace/stereolabs stereolabs
 ```
 
 ```bash
