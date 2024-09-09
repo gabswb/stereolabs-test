@@ -37,7 +37,7 @@ void TrtEngine::BuildEngine(const std::string& onnx_filepath, const std::string&
     if(precision == TrtPrecision::kINT8) {
         if(builder->platformHasFastInt8()) {
             config->setFlag((nvinfer1::BuilderFlag::kINT8));
-            calibrator_ = std::make_unique<Int8EntropyCalibrator2>(1, 640, 640, "../images/", "calib_table", "input_image");
+            calibrator_ = std::make_unique<Int8EntropyCalibrator2>(1, 640, 640, "../samples/", "calib_table", "input_image");
             config->setInt8Calibrator(calibrator_.get());
         } else {
             std::cerr << "int8 quantization not supported by device \n";

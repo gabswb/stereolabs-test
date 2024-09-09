@@ -1,12 +1,5 @@
 #include <iostream>
 
-#include <NvInfer.h>
-#include <cuda_runtime_api.h>
-
-#include <opencv2/opencv.hpp>
-#include <opencv2/dnn/dnn.hpp>
-#include <opencv2/core/cuda.hpp>
-
 #include "TrtEngine.h"
 #include "Yolov10.hpp"
 #include "Yolov8.h"
@@ -116,7 +109,7 @@ int main(int argc, char* argv[]) {
 
         int frame_width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
         int frame_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
-        cv::VideoWriter video("outcpp.avi", cv::VideoWriter::fourcc('M','J','P','G'), 10, cv::Size(frame_width,frame_height));    
+        cv::VideoWriter video("detection_output.avi", cv::VideoWriter::fourcc('M','J','P','G'), 10, cv::Size(frame_width,frame_height));    
         cv::Mat frame;
 
         while(true){

@@ -8,9 +8,9 @@ YOLOv8::YOLOv8(std::unique_ptr<TrtEngine> trt_engine) : score_treshold_{0.2}, nm
     assert(input_dim[2] == input_dim[3]); // support only square images
 
     std::vector<size_t> output_dim = trt_engine_->GetOutputDim();
-    assert(output_dim.size() == 3); // support only dim [batch_size, anchors, xyhw + conf + label]
+    assert(output_dim.size() == 3); // support only dim [batch_size, xyxy + classes scores]
     assert(output_dim[0] = 1); // support only batch_size of 1
-    assert(output_dim[1] == 84); // support only xyhw + class scores[80]
+    assert(output_dim[1] == 84); // support only xyxy + class scores[80]
     
     input_size_  = input_dim[2];
     bbox_pred_dim_ = output_dim[1];
@@ -25,8 +25,10 @@ cv::Mat YOLOv8::PreprocessImage(const cv::Mat& original_img) {
     cv::Mat resized_img;
     cv::resize(rgb_img, resized_img, cv::Size(input_size_, input_size_));
 
-    resized_img.convertTo(resized_img, CV_32FC3, 1.0 / 255.0);
+    // scale values between 0 and 1
+    resized_img.convertTo(resized_img, CV_32FC3, 1.0 / 255.0); 
 
+    // NWHC -> NCWH
     return cv::dnn::blobFromImage(resized_img);
 }
 
@@ -42,7 +44,8 @@ void YOLOv8::DrawBBoxes(const cv::Mat& image, std::vector<cv::Rect> bboxes, std:
         std::string conf_str = stream.str();
         
         cv::rectangle(image, bboxes[i], kClassColors[class_ids[i]], 3);
-        cv::putText(image, kClassNames[class_ids[i]] + " " + conf_str, cv::Point(bboxes[i].x, bboxes[i].y-10), cv::FONT_HERSHEY_SIMPLEX, 0.9, cv::Scalar(255, 255, 255), 2);
+        cv::putText(image, kClassNames[class_ids[i]] + " " + conf_str, cv::Point(bboxes[i].x, bboxes[i].y-10),
+            cv::FONT_HERSHEY_SIMPLEX, 0.9, cv::Scalar(255, 255, 255), 2);
     }
 }
 
@@ -134,6 +137,7 @@ cv::Mat YOLOv8::Detect(cv::Mat& input_img) {
     cv::Mat host_ouput_tensor{cv::Size{8400, 84}, CV_32F};
     CUDA_CHECK(cudaMemcpy(host_ouput_tensor.ptr<float>(0), output_tensor, sizeof(float) * bbox_pred_dim_ * num_anchors_, cudaMemcpyDeviceToHost));
 
+    // transpose to optimize caching when iterate over rows
     host_ouput_tensor = host_ouput_tensor.t();
 
     cv::Mat postprocessed_image = PostprocessImage(host_ouput_tensor, input_img, original_size);
