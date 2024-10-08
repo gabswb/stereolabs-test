@@ -39,4 +39,4 @@ cmake -DCMAKE_BUILD_TYPE=RELEASE \
 make -j4 && \
 make install
 
-WORKDIR /workspace/stereolabs
+WORKDIR /workspace/yolofast
