@@ -2,7 +2,7 @@
 
 #include <iterator>
 #include "NvInfer.h"
-#include "utils.hpp"
+#include "utils.h"
 
 // Calibrator class for performing calibration during int8 quantization of a neural network
 //

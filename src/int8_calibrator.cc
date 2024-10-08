@@ -1,5 +1,5 @@
 
-#include "Int8Calibrator.hpp"
+#include "int8_calibrator.h"
 
 Int8EntropyCalibrator2::Int8EntropyCalibrator2(int batchsize, int input_w, int input_h, const char* img_dir, const char* calib_table_name, const char* input_blob_name)
     : batch_size_(batchsize)

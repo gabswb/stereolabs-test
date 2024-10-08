@@ -1,4 +1,4 @@
-#include "TrtEngine.hpp"
+#include "trt_engine.h"
 
 TrtEngine::TrtEngine(Logger logger) : logger_{logger} {}
 

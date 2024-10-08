@@ -7,8 +7,8 @@
 #include <NvOnnxParser.h>
 #include <cuda_runtime.h>
 
-#include "utils.hpp"
-#include "Int8Calibrator.hpp"
+#include "utils.h"
+#include "int8_calibrator.h"
 
 enum class TrtPrecision {
     kFP32,
